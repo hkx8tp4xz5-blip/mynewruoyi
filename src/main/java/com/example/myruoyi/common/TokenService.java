@@ -42,7 +42,7 @@ public class TokenService {
                 .signWith(key())
                 .compact();
         redisTemplate.opsForValue().set(        //redis登记信息
-                "token" + uuid,
+                "token:" + uuid,
                 token,
                 expireTime,
                 TimeUnit.MILLISECONDS
