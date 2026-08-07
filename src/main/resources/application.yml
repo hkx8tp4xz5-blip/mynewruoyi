@@ -21,7 +21,8 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
 token:
   header: Authorization
-  secret: abcdefghijklmnopqrstuvwxyz
+  secret: abcdefghijklmnopqrstuvwxyz1234567890
+  expireTime: 7200000
 
 mybatis:
   mapper-locations: classpath*:mapper/*.xml
