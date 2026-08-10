@@ -2,7 +2,6 @@ package com.example.myruoyi.common;
 
 
 import com.example.myruoyi.domain.SysUser;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -74,9 +73,12 @@ public class TokenService {                                //生成token的方�
         }
         return uuidFromToken;
 
-
     }
-    public String logout(String token) {
+
+    /**
+     * 删除token
+     */
+    public String deleteToken(String token) {
         String uuidFromToken = parseToken(token);
         redisTemplate.delete("token:" + uuidFromToken);
         return "退出成功";
