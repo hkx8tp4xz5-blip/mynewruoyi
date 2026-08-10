@@ -1,6 +1,6 @@
 package com.example.myruoyi.domain;
 
-public class LoginBody {
+public class LoginBody {           // 接收前端传来的username和password
     private String userName;
     private String password;
     private String code;

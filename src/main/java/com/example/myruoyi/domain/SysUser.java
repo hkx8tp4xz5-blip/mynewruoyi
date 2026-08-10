@@ -1,4 +1,5 @@
 package com.example.myruoyi.domain;
+
 import lombok.Data;
 
 @Data
@@ -10,5 +11,4 @@ public class SysUser {
     private String status;
     private String delFlag;
     private String createTime;
-
 }

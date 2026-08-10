@@ -7,17 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SysLoginService {
+public class SysLoginService {         //核验登陆者的身份和信息，核对账号密码，正确则发token
 
     @Autowired
-    private SysUserMapper sysUserMapper;
+    private SysUserMapper sysUserMapper;        // 自动装配的用户Mapper
 
     @Autowired
-    private TokenService tokenService;
+    private TokenService tokenService;          // 自动装配Token
 
     public String login(String username, String password) {
         SysUser sysUser = sysUserMapper.selectByUsername(username);
-        if (username == null || password == null) {
+        if (sysUser == null) {
             throw new RuntimeException("用户不存在");
         }
         if (!sysUser.getPassword().equals(password)) {

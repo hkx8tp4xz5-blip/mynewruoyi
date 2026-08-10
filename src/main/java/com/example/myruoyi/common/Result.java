@@ -1,7 +1,7 @@
 package com.example.myruoyi.common;
 
-public class Result {
-    private static final long serialVersionUID = 1L;
+public class Result {              // 返回的结果
+    private static final long serialVersionUID = 1L; // 序列化版本号
     private Integer code;
     private String msg;
     private Object data;

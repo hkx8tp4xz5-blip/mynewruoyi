@@ -2,6 +2,7 @@ package com.example.myruoyi.common;
 
 
 import com.example.myruoyi.domain.SysUser;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class TokenService {
+public class TokenService {                                //生成token的方法
     @Value("${token.secret}")
     private String secret;                                 // 设置密钥
 
@@ -32,17 +33,21 @@ public class TokenService {
         return Keys.hmacShaKeyFor(secret.getBytes());        //生成密钥
     }
 
-    public String createToken(SysUser user) {                // token信息
-        String uuid = UUID.randomUUID().toString();
+    /**
+     * 生成token
+     */
+
+    public String createToken(SysUser user) {                // 造token信息
+        String uuid = UUID.randomUUID().toString();          // 生成随机编号 uuid
         String token = Jwts.builder()
-                .setSubject(user.getUserName())        
-                .claim("userId", user.getUserId())
-                .claim("uuid", uuid)
-                .setExpiration(new Date(System.currentTimeMillis() + expireTime))
-                .signWith(key())
+                .setSubject(user.getUserName())               // 写入用户名
+                .claim("userId", user.getUserId())      // 写入用户ID
+                .claim("uuid", uuid)                    // 写入UUID
+                .setExpiration(new Date(System.currentTimeMillis() + expireTime))  // 设置过期时间
+                .signWith(key())                              // 设置签名
                 .compact();
-        redisTemplate.opsForValue().set(        //redis登记信息
-                "token:" + uuid,
+        redisTemplate.opsForValue().set(        //redis信息
+                "token:" + uuid,                //
                 token,
                 expireTime,
                 TimeUnit.MILLISECONDS
@@ -51,7 +56,31 @@ public class TokenService {
         return token;
     }
 
+    /**
+     * 解析token
+     */
 
+    public String parseToken(String token) {          // 验证token信息
+        String uuidFromToken = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("uuid")
+                .toString();
+        String redisToken = redisTemplate.opsForValue().get("token:" + uuidFromToken);
+        if (redisToken == null) {
+            throw new RuntimeException("token过期");
+        }
+        return uuidFromToken;
+
+
+    }
+    public String logout(String token) {
+        String uuidFromToken = parseToken(token);
+        redisTemplate.delete("token:" + uuidFromToken);
+        return "退出成功";
+    }
 }
 
 
