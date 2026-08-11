@@ -32,7 +32,7 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
     public void logout(String token) {
         tokenService.deleteToken(token);
     }
-}
+    }
 
 
 
