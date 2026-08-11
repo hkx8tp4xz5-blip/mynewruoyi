@@ -16,7 +16,7 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
     @Autowired
     private TokenService tokenService;          // 自动装配Token
     @Autowired
-    private TokenFilter tokenFilter;
+    private TokenFilter tokenFilter;            // 自动装配Token过滤器
 
     public String login(String username, String password) {
         SysUser sysUser = sysUserMapper.selectByUsername(username);
