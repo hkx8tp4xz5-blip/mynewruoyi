@@ -1,5 +1,6 @@
 package com.example.myruoyi.service;
 
+import com.example.myruoyi.common.TokenFilter;
 import com.example.myruoyi.common.TokenService;
 import com.example.myruoyi.domain.SysUser;
 import com.example.myruoyi.mapper.SysUserMapper;
@@ -14,6 +15,8 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
 
     @Autowired
     private TokenService tokenService;          // 自动装配Token
+    @Autowired
+    private TokenFilter tokenFilter;
 
     public String login(String username, String password) {
         SysUser sysUser = sysUserMapper.selectByUsername(username);
@@ -26,6 +29,9 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
         return tokenService.createToken(sysUser);
     }
 
+    public void logout(String token) {
+        tokenService.deleteToken(token);
+    }
 }
 
 

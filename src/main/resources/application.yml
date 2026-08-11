@@ -20,7 +20,7 @@ spring:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
 token:
-  header: Authorization
+  header: Authorization             // token header
   secret: abcdefghijklmnopqrstuvwxyz1234567890
   expireTime: 7200000
 

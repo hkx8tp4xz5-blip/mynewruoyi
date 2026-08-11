@@ -87,6 +87,7 @@ public class TokenService {                                //生成token的方�
         redisTemplate.delete("token:" + uuidFromToken);
         return "退出成功";
     }
+
 }
 
 
