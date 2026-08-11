@@ -34,7 +34,7 @@ public class Result {              // 返回的结果
         Result result = new Result();
         result.setCode(200);
         result.setData(data);
-        result.setMsg("操作成功");
+        result.setMsg("登录成功");
         return result;
     }
     public static Result fail(String msg){

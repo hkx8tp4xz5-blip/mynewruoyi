@@ -17,16 +17,15 @@ public class TokenFilter implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler)
             throws Exception {
-        String token = request.getHeader("Authorization");
-
-        try {
-            tokenService.parseToken(token);
-            return true;
-        } catch (RuntimeException e) {
+        String token = request.getHeader("Authorization");        // 取出Authorization,存进token
+        String username = tokenService.parseToken(token);
+        if (username == null) {
             response.setStatus(401);
             response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("token过期");
             return false;
         }
+        return true;
     }
-    
 }
+

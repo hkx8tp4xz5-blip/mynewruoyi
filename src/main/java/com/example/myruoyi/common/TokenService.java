@@ -60,19 +60,23 @@ public class TokenService {                                //生成token的方�
      */
 
     public String parseToken(String token) {          // 验证token信息
-        String uuidFromToken = Jwts.parserBuilder()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("uuid")
-                .toString();
-        String redisToken = redisTemplate.opsForValue().get("token:" + uuidFromToken);
-        if (redisToken == null) {
-            throw new RuntimeException("token过期");
-        }
-        return uuidFromToken;
+        try {
+            String uuidFromToken = Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("uuid")
+                    .toString();
+            String redisToken = redisTemplate.opsForValue().get("token:" + uuidFromToken);
+            if (redisToken == null) {
+                throw new RuntimeException("token过期");
+            }
+            return uuidFromToken;
 
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import com.example.myruoyi.common.Result;
 import com.example.myruoyi.domain.LoginBody;
 import com.example.myruoyi.service.SysLoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,10 @@ public class LoginController {       //登录方法
             return Result.fail(e.getMessage());
         }
     }
-
+    @GetMapping("/hello")
+    public Result hello() {
+        return Result.success("你好，已经登录啦");
+    }
 
 }
 

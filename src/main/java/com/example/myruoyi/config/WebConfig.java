@@ -15,10 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry){
-        registry.addInterceptor(tokenFilter)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/login");
+    public void addInterceptors(InterceptorRegistry lanjieqi){      // 写入拦截器
+        lanjieqi.addInterceptor(tokenFilter)            // 写入拦截器
+                .addPathPatterns("/**")                 // 拦截所有请求
+                .excludePathPatterns("/login");         // 除了登录
     }
 
 
