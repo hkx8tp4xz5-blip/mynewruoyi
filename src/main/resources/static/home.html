@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>主界面</title>
+</head>
+<body>
+
+<h2>欢迎来到主界面</h2>
+<p id="welcome-message">正在登录中</p>
+<button onclick="logout()">退出登录</button>
+
+<script>
+    // 1.检查有无token
+    var token = localStorage.getItem('token');          // 取出token
+    if (!token) {
+        alert("请先登录");
+        location.href = 'login.html';               // 没有token，跳转到登录页
+    }
+
+    // 2.带token调用hello，验证登录是否有效
+    fetch("/hello", {                               //带token调用hello验证登录是否有效
+        method: "GET",
+        headers: {"Authorization": token}
+    })
+        .then(function (resp) {
+            return resp.json();                     // 返回json对象
+        })
+        .then(function (result) {                   // 处理结果  异步
+            if (result.code === 200) {
+                document.getElementById('welcome-message').innerText = "登录有效" + result.data;
+            } else {
+                document.getElementById("welcome-message").innerText = "请重新登录";
+                localStorage.removeItem('token');
+            }
+        })
+
+    // 3.退出登录
+    function logout() {
+        fetch("/logout", {
+            method: "POST",
+            headers: {"Authorization": token}
+        }).then(function () {
+            localStorage.removeItem("token");
+            location.href = 'login.html';
+        })
+    }
+</script>
+
+
+</body>
+</html>

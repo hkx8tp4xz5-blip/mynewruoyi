@@ -26,6 +26,7 @@
                 if (result.code == 200) {
                     localStorage.setItem("token", result.data);
                     alert("登录成功");
+                    location.href = "home.html";
                 } else {
                     alert(result.msg);
                 }
