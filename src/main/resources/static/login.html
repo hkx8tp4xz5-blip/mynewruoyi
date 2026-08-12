@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+
+<body>
+<h2>登录</h2>
+<label>用户名：</label><input id="userName"><br>
+<label>密码：</label><input type="password" id="password"><br>
+<button onclick="login()">登录</button>
+<script>
+    function login() {
+        var userName = document.getElementById("userName").value;
+        var password = document.getElementById("password").value;
+        fetch("/login", {
+            method: "post",// 请求方法
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({userName: userName, password: password})
+        })
+            .then(function (resp) {
+                return resp.json();
+            })
+            .then(function (result) {
+                if (result.code == 200) {
+                    localStorage.setItem("token", result.data);
+                    alert("登录成功");
+                } else {
+                    alert(result.msg);
+                }
+
+            })
+
+        // console.log("用户名：" + userName, "密码：" + password);
+    }
+</script>
+</body>
+</html>

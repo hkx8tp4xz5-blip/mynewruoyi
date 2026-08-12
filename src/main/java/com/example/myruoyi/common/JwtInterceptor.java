@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-public class TokenFilter implements HandlerInterceptor {
+public class JwtInterceptor implements HandlerInterceptor {
     private final TokenService tokenService;
 
-    public TokenFilter(TokenService tokenService) {       // 连接token验证的工具
+    public JwtInterceptor(TokenService tokenService) {       // 连接token验证的工具
         this.tokenService = tokenService;
     }
 
