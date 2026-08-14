@@ -2,6 +2,7 @@ package com.example.myruoyi.common;
 
 
 import com.example.myruoyi.domain.SysUser;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -46,7 +47,7 @@ public class TokenService {                                //生成token的方�
                 .signWith(key())                              // 设置签名
                 .compact();
         redisTemplate.opsForValue().set(        //redis信息
-                "token:" + uuid,                //
+                "token:" + uuid,
                 token,
                 expireTime,
                 TimeUnit.MILLISECONDS
@@ -80,6 +81,25 @@ public class TokenService {                                //生成token的方�
     }
 
     /**
+     * 获取用户名
+     */
+    public String getUserName(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();                  // 拿出完毕
+            return claims.getSubject();
+        } catch (Exception e) {
+            return null;
+        }
+
+
+    }
+
+
+    /**
      * 删除token
      */
     public String deleteToken(String token) {
@@ -87,6 +107,7 @@ public class TokenService {                                //生成token的方�
         redisTemplate.delete("token:" + uuidFromToken);
         return "退出成功";
     }
+
 
 }
 

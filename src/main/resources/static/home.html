@@ -19,7 +19,7 @@
     }
 
     // 2.带token调用hello，验证登录是否有效
-    fetch("/hello", {                               //带token调用hello验证登录是否有效
+    fetch("/getInfo", {                               //带token调用hello验证登录是否有效
         method: "GET",
         headers: {"Authorization": token}
     })
@@ -28,7 +28,7 @@
         })
         .then(function (result) {                   // 处理结果  异步
             if (result.code === 200) {
-                document.getElementById('welcome-message').innerText = "登录有效" + result.data;
+                document.getElementById('welcome-message').innerText = "欢迎：" + result.data;
             } else {
                 document.getElementById("welcome-message").innerText = "请重新登录";
                 localStorage.removeItem('token');

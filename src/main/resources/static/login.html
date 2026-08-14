@@ -8,16 +8,41 @@
 <body>
 <h2>登录</h2>
 <label>用户名：</label><input id="userName"><br>
-<label>密码：</label><input type="password" id="password"><br>
+<label>密码：</label><input id="password" type="password"><br>
+<label>验证码：</label><input id="captcha"><br>
+<img id="captchaImg" onclick="getCaptcha()" title="刷新验证码"><br>           <!--// 刷新验证码-->
 <button onclick="login()">登录</button>
 <script>
+    var captchaUuid = "";
+
+    // 获取验证码方法
+    function getCaptcha() {
+        fetch("/captchaImage")            // 前端访问，调用captchaImage接口进getCode创建验证码
+            .then(function (resp) {
+                return resp.json();
+            })
+            .then(function (result) {                // 接收result，把图片返回给前端
+                if (result.code == 200) {
+                    captchaUuid = result.data.uuid;  // 获取验证码的uuid
+                    document.getElementById("captchaImg").src = "data:image/jpeg;base64," + result.data.img;  // 把图片塞进<img>标签
+                } else {
+                    alert(result.msg);
+                }
+            })
+    }
+
+    getCaptcha();
+
+    // 登录方法
     function login() {
         var userName = document.getElementById("userName").value;
         var password = document.getElementById("password").value;
-        fetch("/login", {
+        var captcha = document.getElementById("captcha").value;
+
+        fetch("/login", {                  // 调进loginController
             method: "post",// 请求方法
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({userName: userName, password: password})
+            body: JSON.stringify({userName: userName, password: password, code: captcha, uuid: captchaUuid})
         })
             .then(function (resp) {
                 return resp.json();
@@ -32,9 +57,10 @@
                 }
 
             })
-
-        // console.log("用户名：" + userName, "密码：" + password);
     }
+
+
+    // console.log("用户名：" + userName, "密码：" + password);
 </script>
 </body>
 </html>

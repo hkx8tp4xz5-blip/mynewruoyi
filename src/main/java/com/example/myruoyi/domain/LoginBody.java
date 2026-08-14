@@ -1,6 +1,6 @@
 package com.example.myruoyi.domain;
 
-public class LoginBody {           // 接收前端传来的username和password
+public class LoginBody {           // 接收前端传来的信息
     private String userName;
     private String password;
     private String code;
@@ -37,4 +37,7 @@ public class LoginBody {           // 接收前端传来的username和password
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }
+
+
 }
+
