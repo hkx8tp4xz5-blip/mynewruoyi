@@ -44,7 +44,7 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
         tokenService.deleteToken(token);                  // 删除token
     }
     public String getCurrentUser(String token) {
-        return tokenService.getUserName(token);          // 返回给当前用户
+        return tokenService.parseToken(token);
     }
 }
 

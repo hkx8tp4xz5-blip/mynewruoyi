@@ -62,49 +62,39 @@ public class TokenService {                                //生成token的方�
 
     public String parseToken(String token) {          // 验证token信息
         try {
-            String uuidFromToken = Jwts.parserBuilder()
-                    .setSigningKey(key())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("uuid")
-                    .toString();
-            String redisToken = redisTemplate.opsForValue().get("token:" + uuidFromToken);
-            if (redisToken == null) {
-                throw new RuntimeException("token过期");
-            }
-            return uuidFromToken;
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * 获取用户名
-     */
-    public String getUserName(String token) {
-        try {
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key())
                     .build()
                     .parseClaimsJws(token)
-                    .getBody();                  // 拿出完毕
+                    .getBody();
+            String uuid = claims.get("uuid").toString();
+            String redisToken = redisTemplate.opsForValue().get("token:" + uuid);
+            if (redisToken == null || !redisToken.equals(token)) {
+                return null;
+            }
             return claims.getSubject();
+
         } catch (Exception e) {
             return null;
         }
-
-
     }
-
 
     /**
      * 删除token
      */
     public String deleteToken(String token) {
-        String uuidFromToken = parseToken(token);
-        redisTemplate.delete("token:" + uuidFromToken);
+        String username = parseToken(token);
+        if (username == null){
+            return "退出失败，token已过期";
+        }
+        String uuid = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("uuid")
+                .toString();
+        redisTemplate.delete("token:" + uuid);
         return "退出成功";
     }
 

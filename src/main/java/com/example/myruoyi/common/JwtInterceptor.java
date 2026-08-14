@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-public class JwtInterceptor implements HandlerInterceptor {
+public class JwtInterceptor implements HandlerInterceptor {          // token验证拦截器
     private final TokenService tokenService;
 
     public JwtInterceptor(TokenService tokenService) {       // 连接token验证的工具
