@@ -23,12 +23,13 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
     private StringRedisTemplate stringRedisTemplate;       // 自动装配Redis
 
     public String login(String username, String password, String code, String uuid) {
-        SysUser sysUser = sysUserMapper.selectByUsername(username);
 
         String redisCode = stringRedisTemplate.opsForValue().get(uuid);
         if (redisCode == null || !redisCode.equals(code)) {          // 先查验证码
             throw new RuntimeException("验证码错误");
         }
+        SysUser sysUser = sysUserMapper.selectByUsername(username);    // 查数据库
+
 
         if (sysUser == null) {
             throw new RuntimeException("用户不存在");
@@ -41,8 +42,9 @@ public class SysLoginService {         //核验登陆者的身份和信息，核
     }
 
     public void logout(String token) {
-        tokenService.deleteToken(token);                  // 删除token
-    }
+        tokenService.deleteToken(token);
+    }           // 删除token
+
     public String getCurrentUser(String token) {
         return tokenService.parseToken(token);
     }
