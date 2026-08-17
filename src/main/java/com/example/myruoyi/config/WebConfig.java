@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {      // 写入拦截器
         registry.addInterceptor(jwtInterceptor)            // 写入拦截器
                 .addPathPatterns("/**")                 // 拦截所有请求    
-                .excludePathPatterns("/login", "/login.html", "/home.html", "/captchaImage");         // 除了登录
+                .excludePathPatterns("/login", "/login.html", "/home.html", "/captchaImage","/user.html");         // 除了登录
     }
 
     /**

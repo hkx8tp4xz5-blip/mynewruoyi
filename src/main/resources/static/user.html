@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+</head>
+<body>
+<h2>用户管理</h2>
+
+<!--1.搜索框-->
+用户名:<input id="searchName">
+<button onclick="searchUser()">搜索用户</button>
+<button onclick="newUser()">新增用户</button>
+
+<!--2.用户表格设计-->
+<table border="1">                             <!-- 表格边框 -->
+    <thead>
+    <tr>
+        <th>用户ID</th>
+        <th>用户名</th>
+        <th>状态</th>
+        <th>创建时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="userList">                    <!-- 后端查到的用户信息 -->
+    </tbody>
+</table>
+
+<!--3.选页按钮-->
+<button onclick="changePage(-1)">上一页</button>
+<span id="pageInfo"></span>
+<button onclick="changePage(1)">下一页</button>
+
+<!--4.新增/编辑填写表单-->
+<div id="formArea" style="display: none">
+    <h3 id="formTitle">新增用户</h3>
+    用户名：<input id="formUserName"><br>
+    密码：<input id="password"><br>
+    状态：<select id="status">
+    <option value="0">正常</option>
+    <option value="1">停用</option>
+</select><br>
+    <button onclick="saveUser()">保存</button>
+    <button onclick="hideForm()">取消</button>
+</div>
+
+<script>
+    var token = localStorage.getItem("token");
+    var currentPage = 1;
+    var totalPages = 1;
+    var changeUserId = null;
+
+    function loadList() {    // 加载用户列表（核心）
+        fetch("/user/list?pageNum=" + currentPage + "&userName=" +
+            encodeURIComponent(document.getElementById("searchName").value), {    //
+            headers: {
+                "Authorization": token
+            }
+        })
+
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (result) {
+                var rows = result.data.rows;          // 当前页数据
+                var total = result.data.total;        // 总条数
+                totalPages = Math.ceil(total / 10);   // 总页数,每页十条，向上取整，eg 9条1页，11条2页
+
+                var html = "";
+                for (var i = 0; i < rows.length; i++) {
+                    var user = rows[i];
+                    html += "<tr>";                   // 把返回的用户拼成表格
+                    html += "<td>" + user.userId + "</td>";
+                    html += "<td>" + user.userName + "</td>";
+                    html += "<td>" + (user.status === "0" ? "正常" : "停用") + "</td>";
+                    html += "<td>" + user.createTime + "</td>";
+                    html += "<td><button onclick='changeUser(" + user.userId + ")'>编辑</button>";
+                    html += "<button onclick='deleteUser(" + user.userId + ")'>删除</button></td>";
+                    html += "</tr>";
+                }
+                document.getElementById("userList").innerHTML = html;
+
+                document.getElementById("pageInfo").innerText = " 共 " + totalPages + " 页，当前第 " + currentPage + " 页"; // 分页信息文本
+
+
+            });
+    }
+
+    loadList(); // 页面打开即加载列表
+
+    function searchUser() {              // 搜索用户
+        currentPage = 1;
+        loadList();
+    }
+
+    function changePage(change) {    // 翻页
+        if (change < 0 && currentPage > 1 || change > 0 && currentPage < totalPages) {
+            currentPage += change;
+            loadList();
+        }
+    }
+
+    function newUser() {         // 新增用户
+        document.getElementById("formArea").style.display = "block";
+        document.getElementById("formTitle").innerText = "新增用户";
+        document.getElementById("formUserName").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("status").value = "0";
+        changeUserId = null;
+    }
+
+    function hideForm() {           // 隐藏表单
+        document.getElementById("formArea").style.display = "none";
+    }
+
+    function changeUser(userId) {
+        fetch("/user/" + userId, {headers: {"Authorization": token}})
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (result) {
+                changeUserId = userId;
+                document.getElementById("formArea").style.display = "block";
+                document.getElementById("formTitle").innerText = "编辑用户";
+                document.getElementById("formUserName").value = result.data.userName;
+                document.getElementById("status").value = result.data.status;
+            });
+    }
+
+    function saveUser() {
+        var body = {
+            userName: document.getElementById("formUserName").value,
+            status: document.getElementById("status").value
+        };
+        var method = "POST";
+        if (changeUserId != null) {            // 非空则编辑
+            body.userId = changeUserId;
+            method = "PUT";
+        } else {                               // 否则新增
+            body.password = document.getElementById("password").value;
+        }
+        fetch("/user", {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify(body)
+        }).then(function () {
+            hideForm();
+            loadList();
+        })
+    }
+
+    function deleteUser(userId) {
+        if (!confirm("是否删除此用户")) return;
+        fetch("/user/" + userId, {
+            method: "DELETE",
+            headers: {"Authorization": token }
+        })
+            .then(loadList);
+    }
+
+
+</script>
+
+
+</body>
+</html>
