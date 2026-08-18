@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+<h1>欢迎来到首页</h1>
+<script>
+    var token = localStorage.getItem("token");
+    if (token){
+        location.href = "home.html";
+    }
+    else{
+        location.href = "login.html";
+    }
+
+</script>
+
+
+</body>
+</html>

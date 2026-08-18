@@ -9,14 +9,16 @@
 <h2>欢迎来到主界面</h2>
 <p id="welcome-message">正在登录中</p>
 <button onclick="logout()">退出登录</button>
+<button onclick="location.href='user.html'">用户管理</button>
 
+<script src="checkLogin.js"></script>
 <script>
-    // 1.检查有无token
-    var token = localStorage.getItem('token');          // 取出token
-    if (!token) {
-        alert("请先登录");
-        location.href = 'login.html';               // 没有token，跳转到登录页
-    }
+    // // 1.检查有无token
+    // var token = localStorage.getItem('token');          // 取出token
+    // if (!token) {
+    //     alert("请先登录");
+    //     location.href = 'login.html';               // 没有token，跳转到登录页
+    // }
 
     // 2.带token调用hello，验证登录是否有效
     fetch("/getInfo", {                               //带token调用hello验证登录是否有效
@@ -42,6 +44,7 @@
             headers: {"Authorization": token}
         }).then(function () {
             localStorage.removeItem("token");
+            alert("已退出登录");
             location.href = 'login.html';
         })
     }

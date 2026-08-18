@@ -11,6 +11,7 @@
 用户名:<input id="searchName">
 <button onclick="searchUser()">搜索用户</button>
 <button onclick="newUser()">新增用户</button>
+<button onclick="logout()">退出登录</button>
 
 <!--2.用户表格设计-->
 <table border="1">                             <!-- 表格边框 -->
@@ -27,7 +28,7 @@
     </tbody>
 </table>
 
-<!--3.选页按钮-->
+<!--3.翻页按钮-->
 <button onclick="changePage(-1)">上一页</button>
 <span id="pageInfo"></span>
 <button onclick="changePage(1)">下一页</button>
@@ -52,7 +53,7 @@
     var changeUserId = null;
 
     function loadList() {    // 加载用户列表（核心）
-        fetch("/user/list?pageNum=" + currentPage + "&userName=" +
+        fetch("/user/list?pageNum=" + currentPage + "&userName=" +                // 查用户列表
             encodeURIComponent(document.getElementById("searchName").value), {    //
             headers: {
                 "Authorization": token
@@ -83,14 +84,13 @@
 
                 document.getElementById("pageInfo").innerText = " 共 " + totalPages + " 页，当前第 " + currentPage + " 页"; // 分页信息文本
 
-
             });
     }
 
     loadList(); // 页面打开即加载列表
 
     function searchUser() {              // 搜索用户
-        currentPage = 1;
+        currentPage = 1;                 // 搜索后返回第一页
         loadList();
     }
 
@@ -115,7 +115,7 @@
     }
 
     function changeUser(userId) {
-        fetch("/user/" + userId, {headers: {"Authorization": token}})
+        fetch("/user/" + userId, {headers: {"Authorization": token}})   // 查具体用户
             .then(function (response) {
                 return response.json();
             })
@@ -141,7 +141,7 @@
             body.password = document.getElementById("password").value;
         }
         fetch("/user", {
-            method: method,
+            method: method,                    // 请求方法
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": token
@@ -157,9 +157,20 @@
         if (!confirm("是否删除此用户")) return;
         fetch("/user/" + userId, {
             method: "DELETE",
-            headers: {"Authorization": token }
+            headers: {"Authorization": token}
         })
             .then(loadList);
+    }
+
+    function logout() {
+        fetch("/logout", {
+            method: "POST",
+            headers: {"Authorization": token}
+        }).then(function () {
+            localStorage.removeItem("token");
+            alert("已退出登录");
+            location.href = 'login.html';
+        })
     }
 
 

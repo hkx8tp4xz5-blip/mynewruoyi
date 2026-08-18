@@ -12,6 +12,7 @@
 <label>验证码：</label><input id="captcha"><br>
 <img id="captchaImg" onclick="getCaptcha()" title="刷新验证码"><br>           <!--// 刷新验证码-->
 <button onclick="login()">登录</button>
+<button id="home" style="display:none" onclick="location.href='home.html'">首页</button>       <!--// 登录成功跳转首页-->
 <script>
     var captchaUuid = "";
 
@@ -51,16 +52,14 @@
                 if (result.code == 200) {
                     localStorage.setItem("token", result.data);
                     alert("登录成功");
-                    location.href = "home.html";
+                    document.getElementById("home").style.display = "block";// 显示按钮
                 } else {
                     alert(result.msg);
                 }
 
             })
     }
-
-
-    // console.log("用户名：" + userName, "密码：" + password);
+    
 </script>
 </body>
 </html>
