@@ -1,10 +1,10 @@
 var token = localStorage.getItem("token");
 if (token == null) {
-    location.href = "login.html"                // 没有token进入登录页
+    location.href = "login.html"                // 没有token踢去登录页
 } else {
     fetch("/getInfo", {headers: {"Authorization": token}})
         .then(function (response) {
-            if (response.status === 401) {
+            if (response.status === 401) {        //token无效401
                 throw "登录失效"
             }
             return response.json();

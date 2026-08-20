@@ -42,35 +42,44 @@
     <option value="0">正常</option>
     <option value="1">停用</option>
 </select><br>
-    <button onclick="saveUser()">保存</button>
+    <button id="saveSuo" onclick="saveUser()">保存</button>
     <button onclick="hideForm()">取消</button>
 </div>
-
+<script src="checkLogin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    var token = localStorage.getItem("token");
-    var currentPage = 1;
-    var totalPages = 1;
-    var changeUserId = null;
+    let token = localStorage.getItem("token");
+    let currentPage = 1;
+    let totalPages = 1;
+    let changeUserId = null;
 
     function loadList() {    // 加载用户列表（核心）
-        fetch("/user/list?pageNum=" + currentPage + "&userName=" +                // 查用户列表
-            encodeURIComponent(document.getElementById("searchName").value), {    //
-            headers: {
+        let searchName = document.getElementById("searchName").value;
+        axios.get("/user/list", {          // 调用axios
+            params: {                      // 传请求参数
+                pageNum: currentPage,
+                userName: searchName
+            },
+            headers: {                     // 传请求头
                 "Authorization": token
             }
         })
 
             .then(function (response) {
-                return response.json();
-            })
-            .then(function (result) {
-                var rows = result.data.rows;          // 当前页数据
-                var total = result.data.total;        // 总条数
+                let result = response.data;  //
+
+                if (result.code === 401) {            // token失效，踢回登录页
+                    localStorage.removeItem("token");
+                    location.href = "login.html";
+                    return;
+                }
+                let rows = result.data.rows;          // 当前页数据
+                let total = result.data.total;        // 总条数
                 totalPages = Math.ceil(total / 10);   // 总页数,每页十条，向上取整，eg 9条1页，11条2页
 
-                var html = "";
-                for (var i = 0; i < rows.length; i++) {
-                    var user = rows[i];
+                let html = "";
+                for (let i = 0; i < rows.length; i++) {
+                    let user = rows[i];
                     html += "<tr>";                   // 把返回的用户拼成表格
                     html += "<td>" + user.userId + "</td>";
                     html += "<td>" + user.userName + "</td>";
@@ -80,10 +89,15 @@
                     html += "<button onclick='deleteUser(" + user.userId + ")'>删除</button></td>";
                     html += "</tr>";
                 }
+
                 document.getElementById("userList").innerHTML = html;
 
-                document.getElementById("pageInfo").innerText = " 共 " + totalPages + " 页，当前第 " + currentPage + " 页"; // 分页信息文本
-
+                document.getElementById("pageInfo").innerText
+                    = " 共 " + totalPages + " 页，当前第 " + currentPage + " 页";   // 分页信息文本
+            })
+            .catch(function (error) {
+                alert("网络/后端出错！");
+                console.error(error);
             });
     }
 
@@ -115,58 +129,69 @@
     }
 
     function changeUser(userId) {
-        fetch("/user/" + userId, {headers: {"Authorization": token}})   // 查具体用户
+        axios.get("/user/" + userId, {
+            headers: {"Authorization": token}
+        })
             .then(function (response) {
-                return response.json();
-            })
-            .then(function (result) {
-                changeUserId = userId;
-                document.getElementById("formArea").style.display = "block";
+                let result = response.data;
+                if (result.code === 401) {
+                    localStorage.removeItem("token");
+                    location.href = "login.html";
+                    return;
+                }
+                changeUserId = result.data.userId;
+                document.getElementById("formArea").style.display = "block";   // 回填表单操作
                 document.getElementById("formTitle").innerText = "编辑用户";
                 document.getElementById("formUserName").value = result.data.userName;
                 document.getElementById("status").value = result.data.status;
             });
     }
 
+
     function saveUser() {
-        var body = {
+        let suo = document.getElementById("saveSuo");
+        suo.disabled = true;
+
+        let body = {
             userName: document.getElementById("formUserName").value,
             status: document.getElementById("status").value
         };
-        var method = "POST";
+        let method = "POST";
         if (changeUserId != null) {            // 非空则编辑
             body.userId = changeUserId;
             method = "PUT";
         } else {                               // 否则新增
             body.password = document.getElementById("password").value;
         }
-        fetch("/user", {
-            method: method,                    // 请求方法
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token
-            },
-            body: JSON.stringify(body)
+        axios.request({
+            url: "/user",
+            method: method,
+            data: body,
+            headers: {"Authorization": token},
         }).then(function () {
             hideForm();
             loadList();
+            suo.disabled = false;
         })
     }
+
 
     function deleteUser(userId) {
         if (!confirm("是否删除此用户")) return;
-        fetch("/user/" + userId, {
-            method: "DELETE",
+        axios.delete("/user/" + userId, {
             headers: {"Authorization": token}
-        })
-            .then(loadList);
+        }).
+        then(loadList)
+        // fetch("/user/" + userId, {
+        //     method: "DELETE",
+        //     headers: {"Authorization": token}})
     }
 
     function logout() {
-        fetch("/logout", {
-            method: "POST",
+        axios.post("/logout", null, {
             headers: {"Authorization": token}
-        }).then(function () {
+        })
+            .then(function () {
             localStorage.removeItem("token");
             alert("已退出登录");
             location.href = 'login.html';

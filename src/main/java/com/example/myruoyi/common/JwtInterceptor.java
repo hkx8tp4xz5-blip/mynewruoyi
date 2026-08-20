@@ -22,7 +22,7 @@ public class JwtInterceptor implements HandlerInterceptor {          // token验
         if (username == null) {
             response.setStatus(401);
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("token过期");
+            response.getWriter().write("{\"code\":401,\"msg\":\"登录已过期，请重新登录\"}");  // 统一返回JSON，方便前端识别
             return false;
         }
         return true;

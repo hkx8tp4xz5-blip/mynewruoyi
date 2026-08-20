@@ -13,16 +13,12 @@ public class LoginController {       //登录方法
 
     @PostMapping("/login")          //接收login
     public Result login(@RequestBody LoginBody loginBody) { // 前端json转Java对象
-        try {
             String token = sysLoginService.login(      //  进service层
                     loginBody.getUserName(),           //  前端数据
                     loginBody.getPassword(),           //  前端数据
                     loginBody.getCode(),               //  前端数据
                     loginBody.getUuid());              //  前端数据
             return Result.success(token);
-        } catch (RuntimeException e) {
-            return Result.fail(e.getMessage());
-        }
     }
 
 
